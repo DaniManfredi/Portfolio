@@ -428,7 +428,7 @@
     <div class="login-logo">Marketing<span>con Agus</span></div>
     <p class="login-sub">Panel de Administración</p>
     <input type="text" class="login-field" id="loginUser" placeholder="Usuario" autocomplete="username">
-    <input type="password" class="login-field" id="loginPass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" class="login-field" id="loginPass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter'){event.preventDefault();doLogin();}">
     <button class="login-btn" onclick="doLogin()">Ingresar</button>
     <p class="login-error" id="loginError">❌ Credenciales incorrectas</p>
     <button onclick="closeAdmin()" style="margin-top:20px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem">Cancelar</button>
@@ -755,10 +755,71 @@ function renderContact(){
 }
 function handleContactForm(e){e.preventDefault();showToast('✉️ Mensaje enviado. ¡Te respondo pronto!');e.target.reset();}
 
-// ── ADMIN AUTH ──
-function openAdmin(){const o=document.getElementById('adminOverlay');o.classList.add('open');document.getElementById('loginUser').value='';document.getElementById('loginPass').value='';document.getElementById('loginError').style.display='none';setTimeout(()=>document.getElementById('loginUser').focus(),100);}
+// ── ADMIN AUTH (SHA-256 + Salt) ──
+// La contraseña nunca está en el código. Solo existe su hash criptográfico.
+// Salt + Hash generados offline. Verificación 100% en el navegador via WebCrypto API.
+const _AH = '2919e29e67bc86316d80feb8713d6bca3f61d04a41a1a2f11e06a7814a1c0d1d';
+const _AS = 'mcag_2025_xK9p';
+
+async function _hashInput(salt, input) {
+  const msgBuffer = new TextEncoder().encode(salt + input);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Constant-time string comparison to prevent timing attacks
+function _safeCompare(a, b) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function openAdmin(){
+  const o=document.getElementById('adminOverlay');o.classList.add('open');
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginError').style.display='none';
+  setTimeout(()=>document.getElementById('loginUser').focus(),100);
+}
 function closeAdmin(){document.getElementById('adminOverlay').classList.remove('open');}
-function doLogin(){if(document.getElementById('loginUser').value.trim()==='ADMIN'&&document.getElementById('loginPass').value==='Agu%%1010'){closeAdmin();openDashboard();}else{const e=document.getElementById('loginError');e.style.display='block';document.getElementById('loginPass').value='';setTimeout(()=>e.style.display='none',3000);}}
+
+async function doLogin(){
+  const userEl = document.getElementById('loginUser');
+  const passEl = document.getElementById('loginPass');
+  const errEl  = document.getElementById('loginError');
+  const btn    = document.querySelector('.login-btn');
+
+  const username = userEl.value.trim();
+  const password = passEl.value;
+
+  // Throttle: disable button briefly to slow brute-force
+  btn.disabled = true;
+  btn.textContent = 'Verificando...';
+
+  try {
+    const inputHash = await _hashInput(_AS, password);
+    const userOk    = _safeCompare(username, 'ADMIN');
+    const passOk    = _safeCompare(inputHash, _AH);
+
+    if (userOk && passOk) {
+      closeAdmin();
+      openDashboard();
+    } else {
+      errEl.style.display = 'block';
+      passEl.value = '';
+      setTimeout(() => errEl.style.display = 'none', 3000);
+    }
+  } catch(e) {
+    errEl.textContent = '❌ Error del sistema. Intentá de nuevo.';
+    errEl.style.display = 'block';
+  } finally {
+    // Artificial delay (500ms) to further slow brute-force attempts
+    await new Promise(r => setTimeout(r, 500));
+    btn.disabled = false;
+    btn.textContent = 'Ingresar';
+  }
+}
 function openDashboard(){document.getElementById('adminDashboard').classList.add('open');loadHeroForm();loadAboutForm();renderClientsAdmin();loadContactForm();updateStats();}
 function logoutAdmin(){document.getElementById('adminDashboard').classList.remove('open');renderPortfolio();renderAbout();renderContact();showToast('Sesión cerrada correctamente');}
 function showPanel(name){document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));const p=document.getElementById(`panel-${name}`);const b=document.querySelector(`[data-panel="${name}"]`);if(p)p.classList.add('active');if(b)b.classList.add('active');if(name==='stats')updateStats();if(name==='clients')renderClientsAdmin();}
