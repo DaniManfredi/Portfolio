@@ -297,24 +297,20 @@
   .filter-btn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);}
   .filter-btn.active{background:var(--ink);color:var(--butter);box-shadow:3px 3px 0 var(--tomato);}
 
-  .portfolio-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px;}
+  .portfolio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
   .client-card{
-    grid-column:span 4;background:var(--cream);border:2.5px solid var(--ink);
+    background:var(--cream);border:2.5px solid var(--ink);
     box-shadow:5px 5px 0 var(--ink);cursor:pointer;
     transition:all 0.25s var(--ease);overflow:hidden;position:relative;
+    display:flex;flex-direction:column;
   }
-  .client-card:nth-child(5n+1){grid-column:span 7;}
-  .client-card:nth-child(5n+2){grid-column:span 5;}
-  .client-card:nth-child(5n+3){grid-column:span 4;}
-  .client-card:nth-child(5n+4){grid-column:span 4;}
-  .client-card:nth-child(5n+5){grid-column:span 4;}
 
   .client-card:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--tomato);}
   .client-card:nth-child(odd):hover{box-shadow:9px 9px 0 var(--lavender-deep);}
   .client-card:nth-child(3n):hover{box-shadow:9px 9px 0 var(--electric);}
 
   .card-media{
-    aspect-ratio:5/4;background:var(--lavender);position:relative;overflow:hidden;
+    aspect-ratio:4/3;background:var(--lavender);position:relative;overflow:hidden;
     border-bottom:2.5px solid var(--ink);display:flex;align-items:center;justify-content:center;
   }
   .card-media img{width:100%;height:100%;object-fit:cover;filter:contrast(1.08) saturate(0.95);transition:transform 0.5s var(--ease);}
@@ -333,21 +329,21 @@
   }
   .client-card:hover .card-arrow-tag{background:var(--tomato);color:var(--butter);transform:rotate(-45deg);}
 
-  .card-body{padding:22px;}
+  .card-body{padding:16px;flex:1;display:flex;flex-direction:column;}
   .card-category{
-    display:inline-block;font-family:var(--mono);font-size:0.66rem;font-weight:700;
-    text-transform:uppercase;letter-spacing:0.16em;color:var(--ink-soft);
-    margin-bottom:12px;background:var(--butter);padding:3px 10px;border:1.5px solid var(--ink);
+    display:inline-block;font-family:var(--mono);font-size:0.6rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-soft);
+    margin-bottom:8px;background:var(--butter);padding:3px 8px;border:1.5px solid var(--ink);align-self:flex-start;
   }
   .card-title{
-    font-family:var(--display);font-size:1.5rem;line-height:1.05;text-transform:uppercase;
-    letter-spacing:-0.02em;color:var(--ink);margin-bottom:10px;
+    font-family:var(--display);font-size:1.15rem;line-height:1.05;text-transform:uppercase;
+    letter-spacing:-0.02em;color:var(--ink);margin-bottom:8px;
   }
   .card-title em{font-family:var(--serif);font-style:italic;text-transform:lowercase;font-weight:400;color:var(--tomato);letter-spacing:-0.01em;}
-  .card-desc{font-family:var(--mono);font-size:0.82rem;color:var(--ink-soft);line-height:1.55;margin-bottom:14px;}
-  .card-tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .card-desc{font-family:var(--mono);font-size:0.72rem;color:var(--ink-soft);line-height:1.5;margin-bottom:10px;}
+  .card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;}
   .card-tag{
-    font-family:var(--mono);font-size:0.66rem;color:var(--ink);padding:3px 8px;
+    font-family:var(--mono);font-size:0.6rem;color:var(--ink);padding:2px 6px;
     background:var(--butter);border:1.5px solid var(--ink);font-weight:700;
   }
   .no-clients{
@@ -612,8 +608,7 @@
     .about-grid{grid-template-columns:1fr;gap:60px;}
     .about-visual{max-width:340px;margin:0 auto;grid-column:1;}
     .about-content{grid-column:1;}
-    .portfolio-grid{grid-template-columns:1fr;}
-    .client-card,.client-card:nth-child(5n+1),.client-card:nth-child(5n+2),.client-card:nth-child(5n+3),.client-card:nth-child(5n+4),.client-card:nth-child(5n+5){grid-column:span 1;}
+    .portfolio-grid{grid-template-columns:repeat(2,1fr);}
     .testimonials-grid{grid-template-columns:1fr;}
     .testimonials-deco{display:none;}
     .contact-grid{grid-template-columns:1fr;gap:30px;}
@@ -626,6 +621,7 @@
     .photo-upload-row{flex-direction:column;}
   }
   @media(max-width:520px){
+    .portfolio-grid{grid-template-columns:1fr;}
     .hero-title{font-size:3rem;}
     .section-title{font-size:2.2rem;}
     .card-title{font-size:1.25rem;}
